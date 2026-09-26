@@ -11,3 +11,14 @@ tr.non-confiance { background: #fef2f2; }
 .evt { background: white; border-left: 4px solid #2563eb; padding: 0.5rem 1rem; margin-bottom: 0.4rem; }
 .evt-possible_spoofing { border-left-color: #dc2626; }
 .evt-new_device { border-left-color: #16a34a; }
+.bouton-export {
+    display: inline-block;
+    margin-top: 0.5rem;
+    background: #2563eb;
+    color: white;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.bouton-export:hover { background: #1d4ed8; }

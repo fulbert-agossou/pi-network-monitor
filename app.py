@@ -1,11 +1,13 @@
 import threading
 import time
 from datetime import datetime
+import csv
+import io
 
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, Response
 
 from config import SCAN_INTERVAL, FLASK_HOST, FLASK_PORT
-from db import init_db, get_all_devices, get_recent_events, approve_device
+from db import init_db, get_all_devices, get_recent_events, approve_device, get_connection
 from scanner import scan_network
 from detector import process_scan
 
@@ -61,6 +63,39 @@ def approuver(mac):
     approve_device(mac)
     return redirect(url_for("dashboard"))
 
+@app.route("/export")
+def export_csv():
+    """
+    Génère un fichier CSV contenant TOUS les événements enregistrés
+    (pas seulement les 50 derniers), et le renvoie au navigateur
+    comme un téléchargement.
+    """
+    conn = get_connection()
+    lignes = conn.execute("SELECT * FROM events ORDER BY id DESC").fetchall()
+    conn.close()
+
+    # io.StringIO() = un "fichier" qui vit en mémoire, pas sur le disque.
+    # On écrit dedans comme si c'était un vrai fichier CSV.
+    memoire = io.StringIO()
+    ecrivain = csv.writer(memoire)
+
+    # Ligne d'en-tête du CSV
+    ecrivain.writerow(["id", "timestamp", "event_type", "mac", "ip", "hostname", "description"])
+
+    # Une ligne de CSV par événement
+    for ligne in lignes:
+        ecrivain.writerow([
+            ligne["id"], ligne["timestamp"], ligne["event_type"],
+            ligne["mac"], ligne["ip"], ligne["hostname"], ligne["description"],
+        ])
+
+    # Response construit la réponse HTTP manuellement, avec les bons
+    # en-têtes pour dire au navigateur "ceci est un fichier à télécharger".
+    return Response(
+        memoire.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=evenements.csv"},
+    )
 
 if __name__ == "__main__":
     init_db()
