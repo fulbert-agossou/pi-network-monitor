@@ -1,0 +1,13 @@
+body { font-family: Arial, sans-serif; margin: 2rem; background: #f4f4f4; }
+header { margin-bottom: 1.5rem; }
+.stats { display: flex; gap: 1rem; margin-bottom: 2rem; }
+.carte { background: white; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.chiffre { display: block; font-size: 1.5rem; font-weight: bold; color: #2563eb; }
+.label { color: #666; font-size: 0.85rem; }
+table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 2rem; }
+th, td { padding: 0.6rem; border-bottom: 1px solid #ddd; text-align: left; }
+tr.non-confiance { background: #fef2f2; }
+.journal { list-style: none; padding: 0; }
+.evt { background: white; border-left: 4px solid #2563eb; padding: 0.5rem 1rem; margin-bottom: 0.4rem; }
+.evt-possible_spoofing { border-left-color: #dc2626; }
+.evt-new_device { border-left-color: #16a34a; }

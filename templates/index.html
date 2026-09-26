@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Station de monitoring réseau</title>
+    <meta http-equiv="refresh" content="15">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Station de monitoring réseau</h1>
+        <p class="sous-titre">Raspberry Pi 4 — Scapy + Flask</p>
+    </header>
+
+    <section class="stats">
+        <div class="carte">
+            <span class="chiffre">{{ info_scan.nb_appareils }}</span>
+            <span class="label">Appareils détectés</span>
+        </div>
+        <div class="carte">
+            <span class="chiffre">{{ info_scan.dernier_scan or "Jamais" }}</span>
+            <span class="label">Dernier scan</span>
+        </div>
+        <div class="carte">
+            <span class="chiffre">{{ "En cours" if info_scan.scan_en_cours else "Inactif" }}</span>
+            <span class="label">Statut du scan (intervalle : {{ scan_interval }}s)</span>
+        </div>
+    </section>
+
+    <section>
+        <h2>Appareils connus</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Statut</th>
+                    <th>Adresse IP</th>
+                    <th>Adresse MAC</th>
+                    <th>Nom (hostname)</th>
+                    <th>Première détection</th>
+                    <th>Dernière détection</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appareil in appareils %}
+                <tr class="{{ 'confiance' if appareil.trusted else 'non-confiance' }}">
+                    <td>{{ "Approuvé" if appareil.trusted else "À vérifier" }}</td>
+                    <td>{{ appareil.ip }}</td>
+                    <td>{{ appareil.mac }}</td>
+                    <td>{{ appareil.hostname }}</td>
+                    <td>{{ appareil.first_seen }}</td>
+                    <td>{{ appareil.last_seen }}</td>
+                    <td>
+                        {% if not appareil.trusted %}
+                        <form action="{{ url_for('approuver', mac=appareil.mac) }}" method="post">
+                            <button type="submit">Approuver</button>
+                        </form>
+                        {% else %}
+                        —
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">Aucun appareil détecté pour l'instant. Attends le premier scan...</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Journal des événements</h2>
+        <ul class="journal">
+            {% for evt in evenements %}
+            <li class="evt evt-{{ evt.event_type }}">
+                <span class="horodatage">{{ evt.timestamp }}</span>
+                <span class="description">{{ evt.description }}</span>
+            </li>
+            {% else %}
+            <li>Aucun événement enregistré pour l'instant.</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <footer>
+        <p>UQTR — Génie électrique, concentration génie informatique</p>
+    </footer>
+</body>
+</html>
