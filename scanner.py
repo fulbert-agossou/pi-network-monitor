@@ -1,5 +1,5 @@
 import socket
-from scapy.all import ARP, Ether, srp
+from scapy.all import ARP, Ether, srp, conf
 from config import NETWORK_RANGE
 
 
@@ -13,6 +13,7 @@ def resolve_hostname(ip):
 def scan_network(ip_range=None):
     if ip_range is None:
         ip_range = NETWORK_RANGE
+
 
     paquet = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_range)
     reponses, _ = srp(paquet, timeout=3, verbose=False)
