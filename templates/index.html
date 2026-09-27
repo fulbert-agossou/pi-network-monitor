@@ -5,6 +5,7 @@
     <title>Station de monitoring réseau</title>
     <meta http-equiv="refresh" content="15">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 </head>
 <body>
     <header>
@@ -27,7 +28,10 @@
             <span class="label">Statut du scan (intervalle : {{ scan_interval }}s)</span>
         </div>
     </section>
-
+<section>
+    <h2>Historique des nouveaux appareils (24 dernières heures)</h2>
+    <canvas id="graphiqueHistorique" style="max-height: 300px;"></canvas>
+</section>
     <section>
         <h2>Appareils connus</h2>
         <table>
@@ -85,5 +89,24 @@
     <footer>
         <p>UQTR — Génie électrique, concentration génie informatique</p>
     </footer>
+    <script>
+        const ctx = document.getElementById('graphiqueHistorique').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ historique_heures | tojson }},
+                datasets: [{
+                    label: 'Nouveaux appareils détectés',
+                    data: {{ historique_valeurs | tojson }},
+                    backgroundColor: '#2563eb',
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

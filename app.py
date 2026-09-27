@@ -7,7 +7,7 @@ import io
 from flask import Flask, render_template, redirect, url_for, Response
 
 from config import SCAN_INTERVAL, FLASK_HOST, FLASK_PORT
-from db import init_db, get_all_devices, get_recent_events, approve_device, get_connection
+from db import init_db, get_all_devices, get_recent_events, approve_device, get_connection, get_events_par_heure
 from scanner import scan_network
 from detector import process_scan
 
@@ -45,6 +45,7 @@ def boucle_de_scan():
 def dashboard():
     appareils = get_all_devices()
     evenements = get_recent_events(50)
+    historique = get_events_par_heure()
 
     with etat_verrou:
         info_scan = dict(etat)
@@ -55,6 +56,8 @@ def dashboard():
         evenements=evenements,
         info_scan=info_scan,
         scan_interval=SCAN_INTERVAL,
+        historique_heures=[h[0] for h in historique],
+        historique_valeurs=[h[1] for h in historique],
     )
 
 

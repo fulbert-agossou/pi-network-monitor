@@ -94,3 +94,27 @@ def get_recent_events(limit=50):
     ).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+def get_events_par_heure():
+    """
+    Compte le nombre d'événements 'new_device' regroupés par heure,
+    pour les dernières 24 heures. Retourne une liste de tuples
+    (heure, nombre), triée du plus ancien au plus récent.
+
+    strftime('%Y-%m-%d %H:00', timestamp) transforme un horodatage
+    complet (ex: "2026-09-26T14:37:12") en juste l'heure arrondie
+    (ex: "2026-09-26 14:00") — c'est ce qui permet de regrouper
+    tous les événements d'une même heure ensemble.
+    """
+    conn = get_connection()
+    rows = conn.execute("""
+        SELECT strftime('%Y-%m-%d %H:00', timestamp) AS heure,
+               COUNT(*) AS nombre
+        FROM events
+        WHERE event_type = 'new_device'
+        GROUP BY heure
+        ORDER BY heure ASC
+        LIMIT 24
+    """).fetchall()
+    conn.close()
+    return [(r["heure"], r["nombre"]) for r in rows]
